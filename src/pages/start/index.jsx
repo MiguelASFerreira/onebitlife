@@ -1,19 +1,38 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, Image, StyleSheet } from "react-native";
 
 export default function Start() {
     return(
-        <View>
+        <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <View>
+                <View style={{alignItems: "center"}}>
                     <Image 
-                        source={require("../../assets/icons/logo3.png")} 
+                        source={require("../../assets/icons/logo3.png")}
+                        style={styles.logo} 
                     />
-                    <Text>
-                        Vamos transformar a sua vida {"/n"} em jogo, buscando sempre {"/n"} o melhor nível.
+                    <Text style={styles.description}>
+                        Vamos transformar a sua vida {"\n"} em jogo, buscando sempre {"\n"}{" "} o melhor nível.
                     </Text>
                 </View>
             </ScrollView>
         </View>
-    )
+    );
 }
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "rgba(21, 21, 21, 0.98)",
+    },
+    logo: {
+        width: 300,
+        height: 60,
+        marginTop: 60,
+        marginBotton: 20,
+    },
+    description: {
+        color: "#fff",
+        fontSize: 20,
+        textAlign: "center",
+        marginVertical: 60,
+    }
+})
