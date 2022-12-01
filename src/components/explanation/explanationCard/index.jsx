@@ -5,7 +5,7 @@ export default function ExplanationCard() {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>
-                {/* Através deste App você vai consolidar {"\n"}4 hábitos de áreas fundamentais */}
+                Através deste App você vai consolidar {"\n"}4 hábitos de áreas fundamentais
             </Text>
             <View style={styles.explanationContainer}>
                 <Image 
