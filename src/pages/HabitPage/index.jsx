@@ -20,7 +20,7 @@ import UpdateExcludeButtons from "../../components/HabitPage/UpdateExcludeButton
 import DefaultButton from "../../components/common/DefaultButton";
 
 import HabitsService from "../../Services/HabitsService";
-import NotificationService from "../../Services/NotificationService"
+import NotificationService from "../../Services/NotificationService";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -74,10 +74,10 @@ export default function HabitPage({ route }) {
     } else {
       if (notificationToggle) {
         NotificationService.createNotification(
-        habitInput,
-        frequencyInput,
-        dayNotification,
-        timeNotification
+          habitInput,
+          frequencyInput,
+          dayNotification,
+          timeNotification
         );
       }
       HabitsService.createHabit({
@@ -93,13 +93,13 @@ export default function HabitPage({ route }) {
         progressBar: 0,
       }).then(() => {
         Alert.alert("Sucesso na criação do hábito!");
-     
+
         navigation.navigate("Home", {
           createdHabit: `Created in ${habitArea}`,
         });
       });
-     }
-   }
+    }
+  }
 
   function handleUpdateHabit() {
     if (notificationToggle === true && !dayNotification && !timeNotification) {
@@ -213,8 +213,8 @@ export default function HabitPage({ route }) {
             {create === false ? (
               <UpdateExcludeButtons
                 handleUpdate={handleUpdateHabit}
-                habitArea={habit?.habitArea}
                 habitInput={habitInput}
+                habitArea={habit?.habitArea}
               />
             ) : (
               <View style={styles.configButton}>
