@@ -81,7 +81,12 @@ export default function Home({ route }) {
 
           <LifeStatus />
 
-          <StatusBar />
+          <StatusBar 
+            mindHabit={mindHabit?.progressBar}
+            moneyHabit={moneyHabit?.progressBar}
+            bodyHabit={bodyHabit?.progressBar}
+            funHabit={funHabit?.progressBar}
+          />
 
           {mindHabit ? (
             <EditHabit habit={mindHabit} checkColor="#90B7F3" />
