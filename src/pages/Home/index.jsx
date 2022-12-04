@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import db from "../../Database";
 import { useNavigation } from "@react-navigation/native";
 
 import { ScrollView, Text, View, StyleSheet } from "react-native";
@@ -7,6 +8,8 @@ import LifeStatus from "../../components/common/LifeStatus";
 import StatusBar from "../../components/Home/StatusBar";
 import CreateHabit from "../../components/Home/CreateHabit";
 import EditHabit from "../../components/Home/EditHabit";
+
+import DefaultButton from "../../components/common/DefaultButton";
 
 import ChangeNavigationService from "../../Services/ChangeNavigationService";
 import HabitsService from "../../Services/HabitsService";
@@ -22,8 +25,18 @@ export default function Home({ route }) {
 
   const [robotDaysLife, setRobotDaysLife] = useState();
   const [checks, setChecks] = useState();
+  const [gameOver, setGameOver] = useState(false);
 
   const today = new Date();
+
+  function handleGameOver() {
+    navigation.navigate("Start");
+  
+    db.transaction((tx) => {
+      tx.executeSql("DROP TABLE habits;");
+      tx.executeSql("DROP TABLE change_navigation;");
+    });
+  }
 
   function handleNavExplanation() {
     navigation.navigate("AppExplanation");
@@ -83,23 +96,36 @@ export default function Home({ route }) {
   useEffect(() => {
     CheckService.removeCheck(mindHabit, moneyHabit, bodyHabit, funHabit);
     CheckService.checkStatus(mindHabit, moneyHabit, bodyHabit, funHabit);
-  
+
     const mindChecks = mindHabit ? mindHabit?.habitChecks : 0;
     const moneyChecks = moneyHabit ? moneyHabit?.habitChecks : 0;
     const bodyChecks = bodyHabit ? bodyHabit?.habitChecks : 0;
     const funChecks = funHabit ? funHabit?.habitChecks : 0;
-  
-    setChecks(mindChecks + moneyChecks + bodyChecks + funChecks);
-  }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
 
+    setChecks(mindChecks + moneyChecks + bodyChecks + funChecks);
+
+    if (
+      mindHabit?.progressBar === 0 ||
+      moneyHabit?.progressBar === 0 ||
+      bodyHabit?.progressBar === 0 ||
+      funHabit?.progressBar === 0
+    ) {
+      setGameOver(true);
+    }
+  }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles.dailyChecks}>
-            ❤️ {robotDaysLife} {robotDaysLife === "01" ? "dia" : "dias"} - ✅ {checks} {checks === 1 ? "Check" : "Checks"}
-          </Text>
+          {!gameOver ? (
+            <Text style={styles.dailyChecks}>
+              ❤️ {robotDaysLife} {robotDaysLife === "01" ? "dia" : "dias"} - ✅{" "}
+              {checks} {checks === 1 ? "Check" : "Checks"}
+            </Text>
+          ) : (
+            <Text style={styles.gameOverTitle}>Game Over</Text>
+          )}
 
           <LifeStatus
             mindHabit={mindHabit}
@@ -115,35 +141,49 @@ export default function Home({ route }) {
             funHabit={funHabit?.progressBar}
           />
 
-          {mindHabit ? (
-            <EditHabit habit={mindHabit} checkColor="#90B7F3" />
+          {!gameOver ? (
+            <View>
+              {mindHabit ? (
+                <EditHabit habit={mindHabit} checkColor="#90B7F3" />
+              ) : (
+                <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
+              )}
+              {moneyHabit ? (
+                <EditHabit habit={moneyHabit} checkColor="#85BB65" />
+              ) : (
+                <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
+              )}
+              {bodyHabit ? (
+                <EditHabit habit={bodyHabit} checkColor="#FF0044" />
+              ) : (
+                <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
+              )}
+              {funHabit ? (
+                <EditHabit habit={funHabit} checkColor="#FE7F23" />
+              ) : (
+                <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
+              )}
+
+              <Text
+                style={styles.explanationText}
+                onPress={() => {
+                  handleNavExplanation();
+                }}
+              >
+                Ver explicações novamente
+              </Text>
+            </View>
           ) : (
-            <CreateHabit habitArea="Mente" borderColor="#90B7F3" />
-          )}
-          {moneyHabit ? (
-            <EditHabit habit={moneyHabit} checkColor="#85BB65" />
-          ) : (
-            <CreateHabit habitArea="Financeiro" borderColor="#85BB65" />
-          )}
-          {bodyHabit ? (
-            <EditHabit habit={bodyHabit} checkColor="#FF0044" />
-          ) : (
-            <CreateHabit habitArea="Corpo" borderColor="#FF0044" />
-          )}
-          {funHabit ? (
-            <EditHabit habit={funHabit} checkColor="#FE7F23" />
-          ) : (
-            <CreateHabit habitArea="Humor" borderColor="#FE7F23" />
+            <View style={{ marginVertical: 40 }}>
+              <DefaultButton
+                buttonText={"Resetar o Game"}
+                handlePress={handleGameOver}
+                width={250}
+                height={50}
+              />
+            </View>
           )}
         </View>
-        <Text
-          style={styles.explanationText}
-          onPress={() => {
-            handleNavExplanation();
-          }}
-        >
-          Ver explicações novamente
-        </Text>
       </ScrollView>
     </View>
   );
@@ -168,5 +208,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingTop: 15,
     paddingBottom: 25,
+  },
+  gameOverTitle: {
+    marginVertical: 25,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });
