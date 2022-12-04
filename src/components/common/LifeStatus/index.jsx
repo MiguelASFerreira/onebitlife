@@ -3,13 +3,9 @@ import { View, StyleSheet } from "react-native";
 
 import Lottie from "lottie-react-native";
 
+import AnimationService from "../../../Services/AnimationService";
+
 export default function LifeStatus() {
-  /*STATUS:
-    100 - Máximo
-    50 - Médio
-    25 - Abaixo
-    00 - Curto
-    */
 
   const [mind, setMind] = useState();
 

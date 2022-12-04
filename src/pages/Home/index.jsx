@@ -10,7 +10,7 @@ import EditHabit from "../../components/Home/EditHabit";
 
 import ChangeNavigationService from "../../Services/ChangeNavigationService";
 import HabitsService from "../../Services/HabitsService";
-import CheckService from "../../services/CheckService";
+import CheckService from "../../Services/CheckService";
 
 export default function Home({ route }) {
   const navigation = useNavigation();
@@ -43,7 +43,7 @@ export default function Home({ route }) {
     HabitsService.findByArea("Humor").then((fun) => {
       setFunHabit(fun[0]);
     });
-  })
+  });
 
   if (excludeArea) {
     if (excludeArea == "Mente") {
@@ -63,18 +63,27 @@ export default function Home({ route }) {
   useEffect(() => {
     ChangeNavigationService.checkShowHome(1)
       .then((showHome) => {
-        const formDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+        const month = `${today.getMonth() + 1}`.padStart(2, "0");
+        const day = `${today.getDate()}`.padStart(2, "0");
+        const formDate = `${today.getFullYear()}-${month}-${day}`;
         const checkDays =
           new Date(formDate) - new Date(showHome.appStartData) + 1;
+
+        if (checkDays === 0) {
+          setRobotDaysLife(checkDays.toString().padStart(2, "0"));
+        } else {
+          setRobotDaysLife(parseInt(checkDays / (1000 * 3600 * 24)));
+        }
         setRobotDaysLife(checkDays.toString().padStart(2, "0"));
       })
       .catch((err) => console.log(err));
-    }, [route.params]);
+  }, [route.params]);
 
-    useEffect(() => {
-      CheckService.removeCheck(mindHabit, moneyHabit, bodyHabit, funHabit);
-    }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
-    
+  useEffect(() => {
+    CheckService.removeCheck(mindHabit, moneyHabit, bodyHabit, funHabit);
+    CheckService.checkStatus(mindHabit, moneyHabit, bodyHabit, funHabit);
+  }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -84,14 +93,14 @@ export default function Home({ route }) {
             Checks
           </Text>
 
-          <LifeStatus 
+          <LifeStatus
             mindHabit={mindHabit}
             moneyHabit={moneyHabit}
             bodyHabit={bodyHabit}
             funHabit={funHabit}
           />
 
-          <StatusBar 
+          <StatusBar
             mindHabit={mindHabit?.progressBar}
             moneyHabit={moneyHabit?.progressBar}
             bodyHabit={bodyHabit?.progressBar}

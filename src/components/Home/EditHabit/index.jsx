@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react";
 import { StyleSheet, TouchableOpacity, View, Alert, Text, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import CheckService from "../../../service/CheckService";
+import CheckService from "../../../Services/CheckService";
 
 export default function EditHabit({ habit, habitName, checkColor }) {
   const navigation = useNavigation();
