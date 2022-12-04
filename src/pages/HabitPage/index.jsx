@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import HabitsService from "../../Services/HabitsService";
 
 import SelectHabit from "../../components/HabitPage/SelectHabit";
 import SelectFrequency from "../../components/HabitPage/SelectFrequency";
@@ -27,11 +28,13 @@ export default function HabitPage({ route }) {
 
   const { create, habit } = route.params;
 
+  const habitCreated = new Date();
+  const formatDate = `${habitCreated.getFullYear()}-${
+    habitCreated.getMonth() + 1
+  }-${habitCreated.getDate()}`;
+
   function handleCreateHabit() {
-    if (
-      habitInput === undefined ||
-      frequencyInput === undefined
-    ) {
+    if (habitInput === undefined || frequencyInput === undefined) {
       Alert.alert(
         "Você precisa selecionar um hábito e frequência para continuar"
       );
@@ -51,9 +54,24 @@ export default function HabitPage({ route }) {
         "Você precisa dizer a frequência e o horário da notificação!"
       );
     } else {
-	     navigation.navigate("Home", {
-         createdHabit: `Created in ${habit?.habitArea}`,
-       });
+      HabitsService.createHabit({
+        habitArea: habit?.habitArea,
+        habitName: habitInput,
+        habitFrequency: frequencyInput,
+        habitHasNotification: notificationToggle,
+        habitNotificationFrequency: dayNotification,
+        habitNotificationTime: timeNotification,
+        lastCheck: formatDate,
+        daysWithoutChecks: 0,
+        habitIsChecked: 0,
+        progressBar: 1,
+      }).then(() => {
+        Alert.alert("Sucesso na criação do hábito!");
+
+        navigation.navigate("Home", {
+          createdHabit: `Created in ${habit?.habitArea}`,
+        });
+      });
     }
   }
 
@@ -66,7 +84,6 @@ export default function HabitPage({ route }) {
       });
     }
   }
-
 
   return (
     <View style={styles.container}>
@@ -83,20 +100,17 @@ export default function HabitPage({ route }) {
           </TouchableOpacity>
           <View style={styles.mainContent}>
             <Text style={styles.title}>Configurações {"\n"} de hábito</Text>
-            
+
             <Text style={styles.inputText}>Área</Text>
             <View style={styles.inputContainer}>
               <Text style={styles.area}>{habit?.habitArea}</Text>
             </View>
 
             <Text style={styles.inputText}>Hábito</Text>
-            <SelectHabit 
-              habit={habit} 
-              habitInput={setHabitInput}
-            />
+            <SelectHabit habit={habit} habitInput={setHabitInput} />
 
             <Text style={styles.inputText}>Frequência</Text>
-            <SelectFrequency 
+            <SelectFrequency
               habitFrequency={habit?.habitFrequency}
               frequencyInput={setFrequencyInput}
             />
@@ -107,7 +121,6 @@ export default function HabitPage({ route }) {
                 setNotificationToggle={setNotificationToggle}
               />
             )}
-            
 
             {notificationToggle ? (
               frequencyInput === "Mensal" ? null : (
@@ -129,7 +142,7 @@ export default function HabitPage({ route }) {
               />
             ) : (
               <View style={styles.configButton}>
-                <DefaultButton 
+                <DefaultButton
                   buttonText={"Criar"}
                   handlePress={handleCreateHabit}
                   width={250}
