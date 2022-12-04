@@ -17,8 +17,9 @@ export default function Home({ route }) {
   const [moneyHabit, setMoneyHabit] = useState();
   const [bodyHabit, setBodyHabit] = useState();
   const [funHabit, setFunHabit] = useState();
-
+  
   const [robotDaysLife, setRobotDaysLife] = useState();
+
   const today = new Date();
 
   function handleNavExplanation() {
@@ -31,8 +32,7 @@ export default function Home({ route }) {
       const formDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
       const checkDays =
         new Date(formDate) - new Date(showHome.appStartData) + 1;
-
-	      setRobotDaysLife(checkDays.toString().padStart(2, "0"));
+	    setRobotDaysLife(checkDays.toString().padStart(2, "0"));
     })
       .catch((err) => console.log(err));
   }, [route.params]);
@@ -42,7 +42,7 @@ export default function Home({ route }) {
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.dailyChecks}>
-          ❤️ {robotDaysLife } {robotDaysLife === "01" ? "dia" : "dias"} - ✅ 80 Checks
+          ❤️ {robotDaysLife} {robotDaysLife === "01" ? "dia" : "dias"} - ✅ 80 Checks
           </Text>
 
           <LifeStatus />
