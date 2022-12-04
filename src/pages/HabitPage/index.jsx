@@ -9,7 +9,8 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import HabitsService from "../../Services/HabitsService";
+
+import * as Notifications from "expo-notifications";
 
 import SelectHabit from "../../components/HabitPage/SelectHabit";
 import SelectFrequency from "../../components/HabitPage/SelectFrequency";
@@ -17,6 +18,16 @@ import Notification from "../../components/HabitPage/Notification";
 import TimeDatePicker from "../../components/HabitPage/TimeDataPicker";
 import UpdateExcludeButtons from "../../components/HabitPage/UpdateExcludeButtons";
 import DefaultButton from "../../components/common/DefaultButton";
+
+import HabitsService from "../../Services/HabitsService";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function HabitPage({ route }) {
   const navigation = useNavigation();
@@ -32,6 +43,12 @@ export default function HabitPage({ route }) {
   const formatDate = `${habitCreated.getFullYear()}-${
     habitCreated.getMonth() + 1
   }-${habitCreated.getDate()}`;
+
+  // Notification Creation
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  // ... ⬇
 
   function handleCreateHabit() {
     if (habitInput === undefined || frequencyInput === undefined) {
@@ -78,7 +95,7 @@ export default function HabitPage({ route }) {
   function handleUpdateHabit() {
     if (notificationToggle === true && !dayNotification && !timeNotification) {
       Alert.alert("Você precisa colocar a frequência e horário da notificação");
-		} else {
+    } else {
       HabitsService.updateHabit({
         habitArea: habit?.habitArea,
         habitName: habitInput,
@@ -90,9 +107,7 @@ export default function HabitPage({ route }) {
       }).then(() => {
         Alert.alert("Sucesso na atualização do hábito");
         if (!notificationToggle) {
-        
         } else {
-     
         }
         navigation.navigate("Home", {
           updatedHabit: `Updated in ${habit?.habitArea}`,
@@ -100,6 +115,42 @@ export default function HabitPage({ route }) {
       });
     }
   }
+
+  // Notification with useEffect
+  useEffect(() => {
+    if (habit?.habitHasNotification == 1) {
+      setNotificationToggle(true);
+      setDayNotification(habit?.habitNotificationFrequency);
+      setTimeNotification(habit?.habitNotificationTime);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (notificationToggle === false) {
+      setTimeNotification(null);
+      setDayNotification(null);
+    }
+  }, [notificationToggle]);
+
+  // Notification Get Token
+  useEffect(() => {
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
