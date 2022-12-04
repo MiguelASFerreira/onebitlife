@@ -89,13 +89,14 @@ export default function HabitPage({ route }) {
         habitNotificationTime: timeNotification,
         lastCheck: formatDate,
         daysWithoutChecks: 0,
-        habitIsChecked: 0,
-        progressBar: 0,
+        habitIsChecked: 1,
+        progressBar: 1,
+        habitChecks: 0,
       }).then(() => {
         Alert.alert("Sucesso na criação do hábito!");
-
+    
         navigation.navigate("Home", {
-          createdHabit: `Created in ${habitArea}`,
+          createdHabit: `Created in ${habit?.habitArea}`,
         });
       });
     }
