@@ -10,6 +10,7 @@ import EditHabit from "../../components/Home/EditHabit";
 
 import ChangeNavigationService from "../../Services/ChangeNavigationService";
 import HabitsService from "../../Services/HabitsService";
+import CheckService from "../../services/CheckService";
 
 export default function Home({ route }) {
   const navigation = useNavigation();
@@ -68,8 +69,12 @@ export default function Home({ route }) {
         setRobotDaysLife(checkDays.toString().padStart(2, "0"));
       })
       .catch((err) => console.log(err));
-  }, [route.params]);
+    }, [route.params]);
 
+    useEffect(() => {
+      CheckService.removeCheck(mindHabit, moneyHabit, bodyHabit, funHabit);
+    }, [mindHabit, moneyHabit, bodyHabit, funHabit]);
+    
   return (
     <View style={styles.container}>
       <ScrollView>
