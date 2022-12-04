@@ -42,7 +42,7 @@ export default function Home({ route }) {
     HabitsService.findByArea("Humor").then((fun) => {
       setFunHabit(fun[0]);
     });
-  });
+  })
 
   if (excludeArea) {
     if (excludeArea == "Mente") {

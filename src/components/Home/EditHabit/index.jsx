@@ -2,6 +2,8 @@ import React, { useState, useEffect} from "react";
 import { StyleSheet, TouchableOpacity, View, Alert, Text, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+import CheckService from "../../../service/CheckService";
+
 export default function EditHabit({ habit, habitName, checkColor }) {
   const navigation = useNavigation();
   const [habitCheck, setHabitCheck] = useState();
@@ -15,10 +17,19 @@ export default function EditHabit({ habit, habitName, checkColor }) {
       habit,
     });
   }
-
+  const checkData = new Date();
+  const formatDate = `${checkData.getFullYear()}-${checkData.getMonth()}-${checkData.getDate()}`;
+  
   function handleCheck() {
     if (habitCheck === 0) {
-			setHabitCheck(1);
+      CheckService.checkHabit({
+        lastCheck: formatDate,
+        habitIsChecked: 1,
+        habitChecks: habit?.habitChecks + 1,
+        habitArea: habit?.habitArea,
+      });
+  
+      setHabitCheck(1);
     }
   }
 
